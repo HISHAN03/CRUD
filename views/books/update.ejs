@@ -1,0 +1,8 @@
+<h2>update Book</h2>
+<form action="/book/<%= book.id%>/update?_method=PUT" method="POST" >
+  <input type="text" name="title" placeholder="title">
+  <input type="text" name="description" placeholder="description">
+  <input type="number" name="pageCount" placeholder="pagecount">
+  <a href="/book">Cancel</a>
+  <button type="submit">Create</button>
+</form>
