@@ -1,0 +1,26 @@
+<h1>books route</h1>
+<div>
+<ul>
+  <form>
+
+    <label><title></title></label>
+    <input type="text" name="title" value="<%= search.title %>">
+    <button type="submit">search</button>
+  </form>
+    <% books.forEach((books)=> { %>
+      <li><%= books.title %>
+        <br>
+      <%= books.description %>
+      <br>
+      <%= books.pageCount %></li><a href="/book/<%= books.id%>/update">edit</a><br>
+
+        <form  method="post"  action="/book/<%= books.id%>/delete?_method=DELETE">
+         <button type="submit">delet</button>
+        </form></li>
+    <%});%>
+  </ul>
+  </div>
+  <br>
+<a href="book/new">new book</a>
+<a href="/">back</a>
+

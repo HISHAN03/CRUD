@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form method="post" action="/authors/<%= name.id %>/update?_method=PUT">
+        <h3>enter your new name</h3>
+        <input type="text" name="name">
+        <button type="submit">update</button> 
+    </form>
+    <a href="/authors">cancel</a>
+    
+</body>
+</html>
