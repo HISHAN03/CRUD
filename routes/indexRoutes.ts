@@ -1,8 +1,9 @@
-const express=require("express")
-const Router=express.Router()
+import express, { Router,Request,Response} from 'express';
+
+const router: Router = express.Router();
 
 
-Router.get("/", (req, res) =>{
+router.get("/", (req:Request, res:Response) =>{
   res.render("index");
   });
 
@@ -15,4 +16,4 @@ Router.get("/", (req, res) =>{
 //   res.send("got name");
 //   });
 
-  module.exports=Router;
+export default Router;

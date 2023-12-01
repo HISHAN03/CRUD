@@ -1,12 +1,15 @@
-const express = require("express");
+import express, { Request, Response } from 'express';
 const Router = express.Router();
-const Name = require("../schema/name");
+const Name = require("../schema/name"); 
 
 
-Router.get('/', async (req, res) => {
-  let searchOptions = {}
-  if (req.query.name != null && req.query.name !== '') {
-    searchOptions.name = new RegExp(req.query.name, 'i')
+Router.get('/', async (req:Request, res:Response) => {
+  let searchOptions: { name?: RegExp}  = {}
+  if (typeof req.query.name === 'string' && req.query.name !== '') {
+    searchOptions.name = new RegExp(req.query.name, 'i');
+  } else if (Array.isArray(req.query.name) && req.query.name.length > 0) {
+    const joinedNames = req.query.name.join(' ');
+    searchOptions.name = new RegExp(joinedNames, 'i');
   }
   try {
     const resources = await Name.find(searchOptions)
@@ -72,4 +75,4 @@ Router.delete("/:id/delete", async (req, res) => {
     console.log(e);
   }
 });
-module.exports = Router;
+export default  Router;
