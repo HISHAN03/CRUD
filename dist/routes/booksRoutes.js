@@ -13,8 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const express_2 = require("express");
 const book_1 = require("../schema/book");
+const zod_1 = require("zod");
 const router = express_1.default.Router();
 //const Book = require('../schema/book') as Book;
 router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -37,12 +37,24 @@ router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 router.get("/new", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.render("books/new");
 }));
+const NewBook = zod_1.z.object({
+    title: zod_1.z.string(),
+    description: zod_1.z.string(),
+    pageCount: zod_1.z.number()
+});
 router.post("/new", (req, res) => {
+    let ParsedInput = NewBook.safeParse(req.body);
+    if (!ParsedInput.success) {
+        res.status(411).json({
+            error: ParsedInput.error
+        });
+        return;
+    }
     try {
         const book = new book_1.Book({
-            title: req.body.title,
-            description: req.body.description,
-            pageCount: req.body.pageCount,
+            title: ParsedInput.data.title,
+            description: ParsedInput.data.description,
+            pageCount: ParsedInput.data.pageCount,
         });
         book.save();
         res.redirect("/book");
@@ -64,24 +76,28 @@ router.put("/:id/update", (req, res) => __awaiter(void 0, void 0, void 0, functi
     let dok;
     try {
         dok = yield book_1.Book.findById(req.params.id);
-        dok.title = req.body.title,
-            dok.description = req.body.description,
-            dok.pageCount = req.body.pageCount;
-        yield dok.save();
-        res.redirect("/book");
+        if (dok) {
+            dok.title = req.body.title,
+                dok.description = req.body.description,
+                dok.pageCount = req.body.pageCount;
+            yield dok.save();
+            res.redirect("/book");
+        }
     }
     catch (e) {
         console.log(e);
     }
 }));
 router.delete("/:id/delete", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        let bo = yield book_1.Book.findById(req.params.id);
-        yield bo.remove();
-        res.redirect("/book");
-    }
-    catch (e) {
-        console.log(e);
+    let bo = yield book_1.Book.findById(req.params.id);
+    if (bo) {
+        try {
+            yield bo.remove();
+            res.redirect("/book");
+        }
+        catch (e) {
+            console.log(e);
+        }
     }
 }));
-exports.default = express_2.Router;
+exports.default = router;

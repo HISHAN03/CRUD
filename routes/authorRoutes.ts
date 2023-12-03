@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 const Router = express.Router();
-const Name = require("../schema/name"); 
-
+import {Name} from "../schema/name"; 
+import { z } from "zod"
 
 Router.get('/', async (req:Request, res:Response) => {
   let searchOptions: { name?: RegExp}  = {}
@@ -35,9 +35,25 @@ Router.get("/add", (req, res) => {
   res.render("authors/add");
 });
 
+
 Router.post("/add", (req, res) => {
+
+
+
+  const inputNameProps= z.object({
+    name:z.string().min(3)
+  })
+  const parsedName=inputNameProps.safeParse(req.body);
+  if(!parsedName.success)
+  {
+    res.status(411).json({
+      error:parsedName.error
+    })
+    return
+  }
+  let newName= parsedName.data.name
   const name = new Name({
-    name: req.body.name,
+    name:newName,
   });
   name.save();
   res.redirect("/authors")
@@ -56,10 +72,18 @@ Router.put("/:id/update", async (req, res) => {
   let Nname;
   try {
     Nname = await Name.findById(req.params.id);
-    Nname.name = req.body.name;
+    if(Nname)
+    {
+      Nname.name = req.body.name;
     console.log(Nname);
     await Nname.save();
     res.redirect("/authors")
+
+    }else{
+      console.log("no name")
+    }
+    
+    
   } catch (e) {
     console.log(e);
   }
@@ -69,8 +93,12 @@ Router.delete("/:id/delete", async (req, res) => {
   let Nname;
   try {
     Nname = await Name.findById(req.params.id);
-    await Nname.remove();
-    res.redirect("/authors")
+    if(Nname)
+    {
+      await Nname.remove();
+      res.redirect("/authors")
+    }
+    
   } catch (e) {
     console.log(e);
   }

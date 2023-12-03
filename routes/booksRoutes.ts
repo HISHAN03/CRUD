@@ -1,7 +1,7 @@
 import express from 'express';
 import { Router, Request, Response } from 'express';
 import { Book } from '../schema/book';
-
+import { z } from "zod"
 const router: Router = express.Router();
 
 //const Book = require('../schema/book') as Book;
@@ -27,13 +27,28 @@ router.get("/", async (req:Request, res:Response) => {
 router.get("/new", async (req, res) => {
   res.render("books/new");
 });
+
+
+const NewBook=z.object({
+  title:z.string(),
+  description:z.string(),
+  pageCount:z.number()
+})
+
 router.post("/new", (req, res) => {
+  let ParsedInput=NewBook.safeParse(req.body)
+  if(!ParsedInput.success)
+  {
+    res.status(411).json({
+      error:ParsedInput.error
+    })
+    return
+  }
   try {
     const book = new Book({
-      title: req.body.title,
-      description: req.body.description,
-
-      pageCount: req.body.pageCount,
+      title: ParsedInput.data.title,
+      description:ParsedInput.data.description,
+      pageCount:ParsedInput.data.pageCount,
     });
     book.save();
     res.redirect("/book")
@@ -55,11 +70,15 @@ router.put("/:id/update", async (req, res) => {
   let dok;
   try {
     dok = await Book.findById(req.params.id);
-    dok.title = req.body.title,
+    if(dok)
+    {
+      dok.title = req.body.title,
       dok.description = req.body.description,
       dok.pageCount = req.body.pageCount
     await dok.save();
     res.redirect("/book")
+    }
+  
 
 
   }
@@ -69,16 +88,18 @@ router.put("/:id/update", async (req, res) => {
 });
 
 router.delete("/:id/delete", async (req, res) => {
-  
-  try {
-    let bo = await Book.findById(req.params.id);
-    await bo.remove();
-    res.redirect("/book")
-
-  } catch (e) {
-    console.log(e);
+  let bo = await Book.findById(req.params.id);
+  if(bo)
+  {
+    try {
+      await bo.remove();
+      res.redirect("/book")
+    } catch (e) {
+      console.log(e);
+    }
   }
+
 });
 
-export default  Router;
+export default  router;
 

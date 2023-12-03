@@ -14,7 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const Router = express_1.default.Router();
-const Name = require("../schema/name");
+const name_1 = require("../schema/name");
+const zod_1 = require("zod");
 Router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let searchOptions = {};
     if (typeof req.query.name === 'string' && req.query.name !== '') {
@@ -25,7 +26,7 @@ Router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         searchOptions.name = new RegExp(joinedNames, 'i');
     }
     try {
-        const resources = yield Name.find(searchOptions);
+        const resources = yield name_1.Name.find(searchOptions);
         res.render('authors/resources', {
             resources: resources,
             searchOptions: req.query
@@ -47,15 +48,26 @@ Router.get("/add", (req, res) => {
     res.render("authors/add");
 });
 Router.post("/add", (req, res) => {
-    const name = new Name({
-        name: req.body.name,
+    const inputNameProps = zod_1.z.object({
+        name: zod_1.z.string().min(3)
+    });
+    const parsedName = inputNameProps.safeParse(req.body);
+    if (!parsedName.success) {
+        res.status(411).json({
+            error: parsedName.error
+        });
+        return;
+    }
+    let newName = parsedName.data.name;
+    const name = new name_1.Name({
+        name: newName,
     });
     name.save();
     res.redirect("/authors");
 });
 Router.get("/:id/update", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const name = yield Name.findById(req.params.id);
+        const name = yield name_1.Name.findById(req.params.id);
         res.render("authors/update", { name: name });
     }
     catch (e) {
@@ -65,11 +77,16 @@ Router.get("/:id/update", (req, res) => __awaiter(void 0, void 0, void 0, functi
 Router.put("/:id/update", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let Nname;
     try {
-        Nname = yield Name.findById(req.params.id);
-        Nname.name = req.body.name;
-        console.log(Nname);
-        yield Nname.save();
-        res.redirect("/authors");
+        Nname = yield name_1.Name.findById(req.params.id);
+        if (Nname) {
+            Nname.name = req.body.name;
+            console.log(Nname);
+            yield Nname.save();
+            res.redirect("/authors");
+        }
+        else {
+            console.log("no name");
+        }
     }
     catch (e) {
         console.log(e);
@@ -78,9 +95,11 @@ Router.put("/:id/update", (req, res) => __awaiter(void 0, void 0, void 0, functi
 Router.delete("/:id/delete", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let Nname;
     try {
-        Nname = yield Name.findById(req.params.id);
-        yield Nname.remove();
-        res.redirect("/authors");
+        Nname = yield name_1.Name.findById(req.params.id);
+        if (Nname) {
+            yield Nname.remove();
+            res.redirect("/authors");
+        }
     }
     catch (e) {
         console.log(e);

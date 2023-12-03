@@ -16,12 +16,14 @@ const indexRoutes_1 = __importDefault(require("./routes/indexRoutes"));
 const authorRoutes_1 = __importDefault(require("./routes/authorRoutes"));
 const booksRoutes_1 = __importDefault(require("./routes/booksRoutes"));
 const port = 3000;
-mongoose_1.default
-    .connect("mongodb+srv://hishan:1234@cluster0.sksy2nt.mongodb.net/?retryWrites=true&w=majority")
-    .then(() => {
-    console.log("Connected to MongoDB");
-})
-    .catch((err) => console.log(err));
+if (process.env.DATABASE_URL) {
+    mongoose_1.default
+        .connect(process.env.DATABASE_URL)
+        .then(() => {
+        console.log("Connected to MongoDB");
+    })
+        .catch((err) => console.log(err));
+}
 // middleware
 app.use((0, method_override_1.default)('_method'));
 app.use(body_parser_1.default.json());
@@ -30,6 +32,6 @@ app.set("view engine", "ejs");
 app.use("/", indexRoutes_1.default);
 app.use("/authors", authorRoutes_1.default);
 app.use("/book", booksRoutes_1.default);
-app.listen(process.env.PORT || 7000, () => {
+app.listen(process.env.PORT || 3000, () => {
     console.log('app is live...');
 });

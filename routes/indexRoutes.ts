@@ -16,4 +16,4 @@ router.get("/", (req:Request, res:Response) =>{
 //   res.send("got name");
 //   });
 
-export default Router;
+export default router;
