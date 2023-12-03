@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ### This project contains the backend for a simple todo app
 Convert this from JS to typescript.
 We have a simple backend for a TODO application.
@@ -32,3 +33,7 @@ You WILL need mongoDB running locally, or a cloud mongoDB instance. Please repla
  - Create types for the inputs to all routes (for eg User, Todo) and use them when u decode the body.
  - Try running tsc now, you should see no errors. 
 
+=======
+# CRUD
+basic crud operation app using REST api 
+>>>>>>> 8a838129e851045d90b0cb3f189900a3228d25f3

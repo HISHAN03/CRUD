@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -30,3 +31,35 @@
     <a href="/">back</a>
   </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>resources</title>
+</head>
+
+<body>
+    <h1>AUTHORS</h1>
+<ul>
+  <form>
+
+    <label>Name</label>
+    <input type="text" name="name" value="<%= searchOptions.name %>">
+    <button type="submit">search</button>
+  </form>
+  <% resources.forEach((res)=> { %>
+    <li><%= res.name %><a href="/authors/<%= res.id%>/update">edit</a><br>
+      <form  method="post"  action="/authors/<%= res.id%>/delete?_method=DELETE">
+       <button type="submit">delet</button>
+      </form></li>
+  <%});%>
+</ul>
+<a href="/authors/add">add author</a>
+<a href="/">back</a>
+
+</body>
+</html>
+>>>>>>> 8a838129e851045d90b0cb3f189900a3228d25f3
